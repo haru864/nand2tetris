@@ -15,4 +15,8 @@ CHIP DMux {
 
     PARTS:
     // Put your code here:
+    Mux(a=in, b=false, sel=sel, out=temp01);
+    Mux(a=false, b=in, sel=sel, out=temp02);
+    Or(a=false, b=temp01, out=a);
+    Or(a=false, b=temp02, out=b);
 }
