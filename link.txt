@@ -1,0 +1,3 @@
+HDL Survival Guide
+https://www.ic.unicamp.br/~rodolfo/mc404/HDL_Survival_Guida-Nand2tetris.pdf
+
