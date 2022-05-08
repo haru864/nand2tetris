@@ -5,3 +5,11 @@ Project02
  Inc16
  ALU
 
+// 16bitを定数ゼロにする
+Inc16(Or16(in, Nor16(in))
+
+// zr
+a=Or8way(0to7)
+b=Or8way(8to15)
+c=Or(a, b)
+zr=Not(c)
