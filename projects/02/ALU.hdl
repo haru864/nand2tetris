@@ -71,10 +71,13 @@ CHIP ALU {
 
     // negate the out output?
     Not16(in=funcOut, out=notFuncOut);
-    Mux16(a=funcOut, b=notFuncOut, sel=no, out=funcOut02);
+    Mux16(a=funcOut, b=notFuncOut, sel=no, out=out, out[0..7]=funcOut02a, out[8..15]=funcOut02b);
 
     // set zr
-    
+    Or8Way(in=funcOut02a, out=Or8way01);
+    Or8Way(in=funcOut02b, out=Or8way02);
+    Or(a=Or8way01, b=Or8way02, out=tempOr);
+    Not(in=tempOr, out=zr);
 
     // set ng
     Mux16(a=funcOut, b=notFuncOut, sel=no, out[0..14]=dummy, out[15]=negFlag);
