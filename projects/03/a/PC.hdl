@@ -17,4 +17,21 @@ CHIP PC {
 
     PARTS:
     // Put your code here:
+
+    DFF(in=inc, out=currInc);
+    DFF(in=reset, out=currReset);
+    DFF(in=load, out=currLoad);
+
+    // if (reset[t-1] == 1) then out[t] = 0
+    Mux16(a=currOut3, b=false, sel=currReset, out=currOut);
+
+    // else if (load[t-1] == 1) then out[t] = in[t-1]
+    Register(in=in, load=true, out=currOut2);
+    Mux16(a=true, b=currOut2, sel=currLoad, out=currOut3);
+
+
+
+
+
+    And16(a=true, b=currOut, out=out);
 }
