@@ -27,11 +27,13 @@ CHIP PC {
 
     // else if (load[t-1] == 1) then out[t] = in[t-1]
     Register(in=in, load=true, out=currOut2);
-    Mux16(a=true, b=currOut2, sel=currLoad, out=currOut3);
+    Mux16(a=currOut6, b=currOut2, sel=currLoad, out=currOut3);
 
-
-
-
+    // else if (inc[t-1] == 1) then out[t] = out[t-1] + 1
+    // else out[t] = out[t-1]
+    Register(in=currOut, load=true, out=currOut4);
+    Inc16(in=currOut4, out=currOut5);
+    Mux16(a=currOut4, b=currOut5, sel=currInc, out=currOut6);
 
     And16(a=true, b=currOut, out=out);
 }
