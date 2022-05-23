@@ -12,3 +12,47 @@
 // the screen should remain fully clear as long as no key is pressed.
 
 // Put your code here.
+
+  (LOOP)
+    // read keyboard input (no input, do nothing)
+    @KBD
+    D=M
+    @index
+    M=0
+    @color
+    M=0
+    @FILL_LOOP
+    D;JEQ
+    @color
+    M=-1
+
+    // fill screen
+  (FILL_LOOP)
+    @index
+    D=M
+    @8191
+    D=D-A
+    @CONTINUE
+    D;JGT
+
+    @index
+    D=M
+    @SCREEN
+    D=D+A
+    @CURRENT
+    M=D
+    @color
+    D=M
+    @CURRENT
+    A=M
+    M=D
+
+    @index
+    M=M+1
+    @FILL_LOOP
+    0;JMP
+
+    // continue loop
+  (CONTINUE)
+    @LOOP
+    0;JMP
