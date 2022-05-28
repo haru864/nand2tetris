@@ -40,4 +40,47 @@ CHIP CPU {
 
     PARTS:
     // Put your code here:
+
+    // Get writeM
+    And(a=instruction[15], b=instruction[0], out=writeM);
+
+    // store and load A register?
+    And(a=instruction[15], b=instruction[2], out=loadFlagA);
+    Mux16(a=outALU, b=instruction, sel=loadFlagA, out=tempOut01);
+    Register(in=tempOut01, load=instruction[15], out=registerOutA);
+
+    // load M or A?
+    Mux16(a=registerOutA, b=inM, sel=instruction[12], out=outAorM);
+
+    // load D register?
+    And(a=instruction[15], b=instruction[1], out=loadFlagD);
+    Register(in=outALU, load=loadFlagD, out=registerOutD);
+
+    // calculate
+    ALU(x=registerOutD, y=registerOutA, 
+    zx=instruction[11], zx=instruction[10], zx=instruction[9], zx=instruction[8], 
+    out=outALU, zr=isOutMZero, ng=isOutMNegative);
+    And16(a=outALU, b=true, out=outM);
+
+    // PC - jump or increment?
+    And(a=false, b=false, out=NoJump);
+
+    Not(in=isOutMZero, out=isOutMZero-N);
+    Not(in=isOutMNegative, out=isOutMNegative-N);
+    And(a=isOutMZero-N, b=isOutMNegative-N, out=isJGT);
+
+    And(a=true, b=isOutMZero, out=isJEQ);
+
+    And(a=true, b=isOutMNegative-N, out=isJGE);
+
+    And(a=true, b=isOutMNegative, out=isJLT);
+
+    And(a=true, b=isOutMZero-N, out=isJNE);
+
+    Or(a=isOutMZero, b=isOutMNegative, out=isJLE);
+
+    And(a=true, b=true, out=isJMP);
+
+    Mux8Way(a=NoJump, b=isJGT, c=isJEQ, d=isJGE, e=isJLT, f=isJNE, g=isJLE, h=isJMP, sel=instruction[0..2], out=pcLoad);
+    PC(in=registerOutA, reset=reset, load=pcLoad, out=pc);
 }
