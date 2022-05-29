@@ -42,10 +42,10 @@ CHIP CPU {
     // Put your code here:
 
     // Get writeM
-    And(a=instruction[15], b=instruction[0], out=writeM);
+    And(a=instruction[15], b=instruction[3], out=writeM);
 
     // store and load A register?
-    And(a=instruction[15], b=instruction[2], out=loadFlagA);
+    And(a=instruction[15], b=instruction[5], out=loadFlagA);
     Mux16(a=outALU, b=instruction, sel=loadFlagA, out=tempOut01);
     Register(in=tempOut01, load=instruction[15], out=registerOutA);
 
@@ -53,7 +53,7 @@ CHIP CPU {
     Mux16(a=registerOutA, b=inM, sel=instruction[12], out=outAorM);
 
     // load D register?
-    And(a=instruction[15], b=instruction[1], out=loadFlagD);
+    And(a=instruction[15], b=instruction[4], out=loadFlagD);
     Register(in=outALU, load=loadFlagD, out=registerOutD);
 
     // calculate
@@ -81,6 +81,13 @@ CHIP CPU {
 
     And(a=true, b=true, out=isJMP);
 
-    Mux8Way(a=NoJump, b=isJGT, c=isJEQ, d=isJGE, e=isJLT, f=isJNE, g=isJLE, h=isJMP, sel=instruction[0..2], out=pcLoad);
-    PC(in=registerOutA, reset=reset, load=pcLoad, out=pc);
+    Mux(a=NoJump, b=isJGT, sel=instruction[0], out=temp01);
+    Mux(a=isJEQ, b=isJGE, sel=instruction[0], out=temp02);
+    Mux(a=isJLT, b=isJNE, sel=instruction[0], out=temp03);
+    Mux(a=isJLE, b=isJMP, sel=instruction[0], out=temp04);
+    Mux(a=temp01, b=temp02, sel=instruction[1], out=temp05);
+    Mux(a=temp03, b=temp04, sel=instruction[1], out=temp06);
+    Mux(a=temp05, b=temp06, sel=instruction[2], out=pcLoad);
+
+    PC(in=registerOutA, reset=reset, load=pcLoad, out[0..14]=pc);
 }
