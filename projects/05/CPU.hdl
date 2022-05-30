@@ -45,20 +45,22 @@ CHIP CPU {
     And(a=instruction[15], b=instruction[3], out=writeM);
 
     // store and load A register?
-    And(a=instruction[15], b=instruction[5], out=loadFlagA);
-    Mux16(a=outALU, b=instruction, sel=loadFlagA, out=tempOut01);
-    Register(in=tempOut01, load=instruction[15], out=registerOutA);
+    Mux16(a=instruction, b=outALU, sel=instruction[15], out=tempOut01);
+    
+    Not(in=instruction[15], out=N15);
+    Or(a=N15, b=instruction[5], out=loadAFlag);
+    ARegister(in=tempOut01, load=loadAFlag, out=registerOutA, out[0..14]=addressM);
 
     // load M or A?
     Mux16(a=registerOutA, b=inM, sel=instruction[12], out=outAorM);
 
     // load D register?
     And(a=instruction[15], b=instruction[4], out=loadFlagD);
-    Register(in=outALU, load=loadFlagD, out=registerOutD);
+    DRegister(in=outALU, load=loadFlagD, out=registerOutD);
 
     // calculate
-    ALU(x=registerOutD, y=registerOutA, 
-    zx=instruction[11], zx=instruction[10], zx=instruction[9], zx=instruction[8], 
+    ALU(x=registerOutD, y=outAorM, 
+    zx=instruction[11], zx=instruction[10], zx=instruction[9], zx=instruction[8], f=instruction[7], no=instruction[6],
     out=outALU, zr=isOutMZero, ng=isOutMNegative);
     And16(a=outALU, b=true, out=outM);
 
@@ -89,5 +91,5 @@ CHIP CPU {
     Mux(a=temp03, b=temp04, sel=instruction[1], out=temp06);
     Mux(a=temp05, b=temp06, sel=instruction[2], out=pcLoad);
 
-    PC(in=registerOutA, reset=reset, load=pcLoad, out[0..14]=pc);
+    PC(in=registerOutA, reset=reset, load=pcLoad, inc=true, out[0..14]=pc);
 }
