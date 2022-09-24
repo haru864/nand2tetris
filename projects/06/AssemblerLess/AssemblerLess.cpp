@@ -1,9 +1,13 @@
 #include <iostream>
 #include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
 #include <errno.h>
 #include <string.h>
 #include <string>
+#include <limits.h>
+
+#define INSTRUCTION_SIZE 16
 
 #define SAFE_FREE(ptr) \
     {                  \
@@ -19,7 +23,8 @@ typedef struct FILE_WITH_NAME
 
 void error_exit(char *);
 char *getFileName(char *);
-void getOutFile(file_with_name &, char *, char *);
+void openOutFile(file_with_name &, char *, char *);
+void do_assemble(FILE *, FILE *);
 void printChar(char *);
 
 int main(int argc, char *argv[])
@@ -70,7 +75,9 @@ int main(int argc, char *argv[])
         exit(1);
     }
 
-    getOutFile(outFile, inFile.name, destDir);
+    openOutFile(outFile, inFile.name, destDir);
+
+    do_assemble(inFile.fileptr, outFile.fileptr);
 
     if (fclose(inFile.fileptr) == EOF)
     {
@@ -112,10 +119,14 @@ char *getFileName(char *filepath)
     return filename;
 }
 
-void getOutFile(file_with_name &outFile, char *inFileName, char *outFileDir)
+void openOutFile(file_with_name &outFile, char *inFileName, char *outFileDir)
 {
     std::string temp(inFileName);
     size_t pos = temp.find(".asm");
+    if (pos == std::string::npos)
+    {
+        fprintf(stderr, "only .asm file is processed correctly\n");
+    }
     temp = temp.substr(0, pos) + ".hack";
     char *outFileName = (char *)malloc(temp.length());
     for (int i = 0; i < temp.length(); i++)
@@ -140,6 +151,58 @@ void getOutFile(file_with_name &outFile, char *inFileName, char *outFileDir)
     if (!outFile.fileptr)
     {
         error_exit("cannot open/create hack file");
+    }
+}
+
+void do_assemble(FILE *in, FILE *out)
+{
+    char buf[LINE_MAX];
+
+    while (fgets(buf, sizeof(buf), in))
+    {
+        if (buf[0] == '\n')
+            continue;
+        if (buf[0] == '/' && buf[1] == '/')
+            continue;
+
+        char binary[INSTRUCTION_SIZE + 1];
+        for (int i = 0; i < INSTRUCTION_SIZE; i++)
+        {
+            binary[i] = '0';
+        }
+        binary[INSTRUCTION_SIZE] = '\0';
+
+        if (buf[0] == '@')
+        {
+            int dec = 0;
+            for (int i = 1; buf[i] != '\n'; i++)
+            {
+                dec = dec * 10 + (buf[i] - '0');
+            }
+            std::string binaryDigit = "";
+            while (dec > 0)
+            {
+                char ch = (dec % 2) + '0';
+                binaryDigit = ch + binaryDigit;
+                dec /= 2;
+            }
+            int idx = INSTRUCTION_SIZE - binaryDigit.length();
+            for (size_t i = 0; i < binaryDigit.length(); i++)
+            {
+                binary[idx++] = binaryDigit[i];
+            }
+        }
+        else
+        {
+            // do nothing
+        }
+
+        fputs(binary, out);
+        fputs("\n", out);
+        if (fputs(buf, out) == EOF)
+        {
+            fprintf(stderr, "failure to write destination file\n");
+        }
     }
 }
 
