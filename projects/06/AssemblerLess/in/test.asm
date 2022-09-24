@@ -1,6 +1,0 @@
-Hello
-World
-
-hogehoge
-
-hugahuga
