@@ -6,9 +6,12 @@
 class Code
 {
 public:
-    static std::string dest(std::string mnemonic);
-    static std::string comp(std::string mnemonic);
-    static std::string jump(std::string mnemonic);
+    std::map<std::string, std::string> COMP_TABLE, DEST_TABLE, JUMP_TABLE;
+    Code();
+    ~Code();
+    std::string dest(std::string mnemonic);
+    std::string comp(std::string mnemonic);
+    std::string jump(std::string mnemonic);
 };
 
 #endif

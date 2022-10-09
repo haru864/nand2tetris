@@ -1,8 +1,8 @@
-#include "Parser.h"
+#include "../include/Parser.h"
 
 Parser::Parser(std::string path)
 {
-    std::cout << "Parser started..." << std::endl;
+    // std::cout << "Parser started..." << std::endl;
     Parser::asmFile = fopen(path.c_str(), "r");
     if (!Parser::asmFile)
     {
@@ -13,21 +13,21 @@ Parser::Parser(std::string path)
 
 Parser::~Parser()
 {
-    std::cout << "Parser ended" << std::endl;
+    // std::cout << "Parser ended" << std::endl;
+    fclose(asmFile);
 }
 
 bool Parser::hasMoreCommands()
 {
-    if (Parser::asmFile->_IO_read_ptr == NULL)
-    {
-        return true;
-    }
-    return Parser::asmFile->_IO_read_ptr == Parser::asmFile->_IO_read_end;
+    // fprintf(stderr, "%p, %p\n", asmFile->_IO_read_ptr, asmFile->_IO_read_end);
+    // fprintf(stderr, "%d\n", feof(asmFile));
+    return (feof(asmFile) == 0) ? true : false;
 }
 
 void Parser::advance()
 {
-    while (fgets(Parser::buf, BUF_SIZE, Parser::asmFile) != NULL)
+    char buf[BUF_SIZE];
+    while (fgets(buf, BUF_SIZE, Parser::asmFile) != NULL)
     {
         if (buf[0] == '\n' || (buf[0] == '/' && buf[1] == '/'))
         {
@@ -41,11 +41,12 @@ void Parser::advance()
     Parser::currentCommand = "";
     for (int i = 0; i < BUF_SIZE; i++)
     {
-        if (buf[i] == '\0')
+        if (buf[i] == '\n' || buf[i] == '\0')
         {
             break;
         }
-        Parser::currentCommand += Parser::buf[i];
+        // fprintf(stdout, "%d\n", (int)buf[i]);
+        Parser::currentCommand += buf[i];
     }
 }
 
@@ -59,8 +60,8 @@ int Parser::commandType()
     {
         return L_COMMAND;
     }
-    else if (currentCommand.find("=") == std::string::npos ||
-             currentCommand.find(";") == std::string::npos)
+    else if (currentCommand.find("=") != std::string::npos ||
+             currentCommand.find(";") != std::string::npos)
     {
         return C_COMMAND;
     }
@@ -69,11 +70,11 @@ int Parser::commandType()
 
 std::string Parser::symbol()
 {
-    if (currentCommand[0] != '@')
+    if (currentCommand[0] == '@')
     {
         return currentCommand.substr(1);
     }
-    else if (currentCommand[0] != '(')
+    else if (currentCommand[0] == '(')
     {
         return currentCommand.substr(1, currentCommand.length() - 2);
     }
@@ -98,11 +99,12 @@ std::string Parser::comp()
     {
         head = -1;
     }
-    head++;
     if (tail == std::string::npos)
     {
         tail = currentCommand.length();
+        // printf("cmd: %s, %d\n", currentCommand.c_str(), (int)currentCommand.length());
     }
+    head++;
     return currentCommand.substr(head, tail - head);
 }
 

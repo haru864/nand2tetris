@@ -7,9 +7,8 @@
 
 class Parser
 {
-private:
+public:
     FILE *asmFile;
-    char buf[BUF_SIZE];
     std::string currentCommand;
 
 public:

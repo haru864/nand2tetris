@@ -1,2 +1,1 @@
-#include "SymbolTable.h"
-
+#include "../include/SymbolTable.h"

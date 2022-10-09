@@ -6,9 +6,6 @@ class SymbolTable
 private:
     SymbolTable();
     ~SymbolTable();
-
-public:
-    static int;
 };
 
 #endif
