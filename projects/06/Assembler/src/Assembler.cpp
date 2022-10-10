@@ -1,6 +1,7 @@
 #include "../include/AllHeaders.h"
 #include "../include/Parser.h"
 #include "../include/Code.h"
+#include "../include/SymbolTable.h"
 
 std::string decimalToBinary(std::string);
 
@@ -25,17 +26,37 @@ int main(int argc, char *argv[])
         exit(1);
     }
     std::string hackFileName = asmFileName.substr(0, pos) + ".hack";
-    std::cout << hackFileName << std::endl;
     FILE *fp = fopen(hackFileName.c_str(), "w");
 
     // create object
     Parser *parser = new Parser(asmFilePath);
     Code *code = new Code();
+    SymbolTable *symbolTable = new SymbolTable();
 
-    // read .asm, assemble line, and write binary into .hack
+    // 1st lap: search symbols, link symbol with address
+    while (parser->hasMoreCommands())
+    {
+        std::cout << parser->currentCommand << std::endl;
+        parser->advance();
+        if (parser->commandType() == L_COMMAND)
+        {
+            int addr = symbolTable->getCurrentAddress();
+            std::string symbol = parser->symbol();
+            std::cout << parser->currentCommand << " -> " << symbol << " -> " << addr << std::endl;
+            if (symbolTable->contains(symbol))
+            {
+                continue;
+            }
+            symbolTable->addEntry(symbol, addr);
+        }
+    }
+
+    // 2nd lap: read assembly line, write instruction into hack file
+    rewind(parser->asmFile);
     int debugCount = 0;
     while (parser->hasMoreCommands())
     {
+        std::cout << parser->currentCommand << std::endl;
         parser->advance();
         std::string binCode = "";
         if (parser->commandType() == A_COMMAND)
@@ -44,7 +65,8 @@ int main(int argc, char *argv[])
         }
         else if (parser->commandType() == L_COMMAND)
         {
-            // coding later
+            int address = symbolTable->getAddress(parser->symbol());
+            binCode = decimalToBinary(std::to_string(address));
         }
         else if (parser->commandType() == C_COMMAND)
         {
@@ -63,12 +85,13 @@ int main(int argc, char *argv[])
         binCode += '\n';
         fprintf(fp, "%s", binCode.c_str());
         // std::cout << "L: " << ++debugCount << " | " << parser->currentCommand << std::endl;
-        // std::cout << binCode << std::endl;
+        std::cout << binCode << std::endl;
     }
 
     // erase object
     delete parser;
     delete code;
+    delete symbolTable;
     fclose(fp);
 
     exit(0);

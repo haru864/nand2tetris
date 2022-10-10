@@ -41,9 +41,13 @@ void Parser::advance()
     Parser::currentCommand = "";
     for (int i = 0; i < BUF_SIZE; i++)
     {
-        if (buf[i] == '\n' || buf[i] == '\0')
+        if (buf[i] == '\n' || buf[i] == '\0' || (buf[i] == '/' && buf[i + 1] == '/'))
         {
             break;
+        }
+        if (buf[i] == ' ')
+        {
+            continue;
         }
         // fprintf(stdout, "%d\n", (int)buf[i]);
         Parser::currentCommand += buf[i];

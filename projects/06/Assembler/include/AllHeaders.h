@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <errno.h>
 #include <map>
+#include <set>
 
 #define A_COMMAND 0
 #define C_COMMAND 1

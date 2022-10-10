@@ -10,7 +10,7 @@ Assembler : Assembler.cpp Code.cpp Parser.cpp SymbolTable.cpp \
 
 assemble :
 	./Assembler Add.asm
-# ./Assembler Max.asm
+	./Assembler Max.asm
 	./Assembler MaxL.asm
 # ./Assembler Pong.asm
 	./Assembler PongL.asm
@@ -19,7 +19,7 @@ assemble :
 
 compare :
 	diff Add.hack ../CorrectBinary/Add.hack
-# diff Max.hack ../CorrectBinary/Max.hack
+	diff Max.hack ../CorrectBinary/Max.hack
 	diff MaxL.hack ../CorrectBinary/MaxL.hack
 # diff Pong.hack ../CorrectBinary/Pong.hack
 	diff PongL.hack ../CorrectBinary/PongL.hack
