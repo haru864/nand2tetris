@@ -12,31 +12,39 @@ SymbolTable::SymbolTable()
     {
         std::string s = "R" + std::to_string(i);
         SymbolTable::symbolTable[s] = i;
-        SymbolTable::usedAddress.insert(i);
     }
-    SymbolTable::currentAddress = 16;
+    SymbolTable::symbolAddress = 0;
+    SymbolTable::variableAddress = 16;
 
-    SymbolTable::symbolTable["SCREEN"] = 16384;
-    SymbolTable::symbolTable["KBD"] = 24576;
-    SymbolTable::usedAddress.insert(16384);
-    SymbolTable::usedAddress.insert(24576);
+    SymbolTable::symbolTable["SCREEN"] = SCREEN_ADDRESS;
+    SymbolTable::symbolTable["KBD"] = KBD_ADDRESS;
 }
 
 SymbolTable::~SymbolTable() {}
 
-int SymbolTable::getCurrentAddress()
+int SymbolTable::getSymbolAddress()
 {
-    while (SymbolTable::usedAddress.count(SymbolTable::currentAddress) != 0)
-    {
-        SymbolTable::currentAddress++;
-    }
-    return SymbolTable::currentAddress;
+    return SymbolTable::symbolAddress;
+}
+
+int SymbolTable::getVariableAddress()
+{
+    return SymbolTable::variableAddress;
+}
+
+void SymbolTable::increaseSymbolAddress()
+{
+    SymbolTable::symbolAddress++;
+}
+
+void SymbolTable::increaseVariableAddress()
+{
+    SymbolTable::variableAddress++;
 }
 
 void SymbolTable::addEntry(std::string symbol, int address)
 {
     SymbolTable::symbolTable[symbol] = address;
-    SymbolTable::usedAddress.insert(address);
 }
 
 bool SymbolTable::contains(std::string symbol)
@@ -47,4 +55,9 @@ bool SymbolTable::contains(std::string symbol)
 int SymbolTable::getAddress(std::string symbol)
 {
     return SymbolTable::symbolTable[symbol];
+}
+
+bool SymbolTable::isAvailableAddr(int address)
+{
+    return (address > 15 && address < SCREEN_ADDRESS);
 }

@@ -7,16 +7,20 @@ class SymbolTable
 {
 private:
     std::map<std::string, int> symbolTable;
-    std::set<int> usedAddress;
-    int currentAddress;
+    int symbolAddress;
+    int variableAddress;
 
 public:
     SymbolTable();
     ~SymbolTable();
-    int getCurrentAddress();
+    int getSymbolAddress();
+    int getVariableAddress();
+    void increaseSymbolAddress();
+    void increaseVariableAddress();
     void addEntry(std::string, int);
     bool contains(std::string);
     int getAddress(std::string);
+    bool isAvailableAddr(int);
 };
 
 #endif

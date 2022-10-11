@@ -4,6 +4,7 @@
 #include "../include/SymbolTable.h"
 
 std::string decimalToBinary(std::string);
+bool isVariable(std::string);
 
 int main(int argc, char *argv[])
 {
@@ -36,13 +37,27 @@ int main(int argc, char *argv[])
     // 1st lap: search symbols, link symbol with address
     while (parser->hasMoreCommands())
     {
-        std::cout << parser->currentCommand << std::endl;
         parser->advance();
-        if (parser->commandType() == L_COMMAND)
+        // std::cout << parser->currentCommand << std::endl;
+        if (parser->commandType() == C_COMMAND || parser->commandType() == A_COMMAND)
         {
-            int addr = symbolTable->getCurrentAddress();
+            symbolTable->increaseSymbolAddress();
+            if (parser->commandType() == A_COMMAND && isVariable(parser->symbol()))
+            {
+                // std::cout << "var: " << parser->symbol() << std::endl;
+                if (symbolTable->contains(parser->symbol()))
+                {
+                    continue;
+                }
+                symbolTable->addEntry(parser->symbol(), symbolTable->getVariableAddress());
+                symbolTable->increaseVariableAddress();
+            }
+        }
+        else if (parser->commandType() == L_COMMAND)
+        {
+            int addr = symbolTable->getSymbolAddress();
             std::string symbol = parser->symbol();
-            std::cout << parser->currentCommand << " -> " << symbol << " -> " << addr << std::endl;
+            // std::cout << parser->currentCommand << " -> " << symbol << " -> " << addr << std::endl;
             if (symbolTable->contains(symbol))
             {
                 continue;
@@ -51,22 +66,26 @@ int main(int argc, char *argv[])
         }
     }
 
-    // 2nd lap: read assembly line, write instruction into hack file
     rewind(parser->asmFile);
-    int debugCount = 0;
+
+    // 2nd lap: read assembly line, write instruction into hack file
     while (parser->hasMoreCommands())
     {
-        std::cout << parser->currentCommand << std::endl;
         parser->advance();
+        // printf("(debug02) cmd: %s, type: %d\n", parser->currentCommand.c_str(), parser->commandType());
         std::string binCode = "";
         if (parser->commandType() == A_COMMAND)
         {
-            binCode = decimalToBinary(parser->symbol());
+            std::string currAddr = parser->symbol();
+            if (symbolTable->contains(currAddr))
+            {
+                currAddr = std::to_string(symbolTable->getAddress(currAddr));
+            }
+            binCode = decimalToBinary(currAddr);
         }
         else if (parser->commandType() == L_COMMAND)
         {
-            int address = symbolTable->getAddress(parser->symbol());
-            binCode = decimalToBinary(std::to_string(address));
+            continue;
         }
         else if (parser->commandType() == C_COMMAND)
         {
@@ -85,7 +104,7 @@ int main(int argc, char *argv[])
         binCode += '\n';
         fprintf(fp, "%s", binCode.c_str());
         // std::cout << "L: " << ++debugCount << " | " << parser->currentCommand << std::endl;
-        std::cout << binCode << std::endl;
+        // std::cout << binCode << std::endl;
     }
 
     // erase object
@@ -111,4 +130,9 @@ std::string decimalToBinary(std::string dec)
         ret = '0' + ret;
     }
     return ret;
+}
+
+bool isVariable(std::string s)
+{
+    return s[0] >= 'a' && s[0] <= 'z';
 }

@@ -12,5 +12,7 @@
 #define C_COMMAND 1
 #define L_COMMAND 2
 #define COMMAND_LENGTH 16
+#define SCREEN_ADDRESS 16384
+#define KBD_ADDRESS 24576
 
 #endif
