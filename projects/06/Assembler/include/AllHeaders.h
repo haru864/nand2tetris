@@ -7,6 +7,7 @@
 #include <errno.h>
 #include <map>
 #include <set>
+#include <queue>
 
 #define A_COMMAND 0
 #define C_COMMAND 1

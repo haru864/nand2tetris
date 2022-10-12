@@ -42,6 +42,26 @@ void SymbolTable::increaseVariableAddress()
     SymbolTable::variableAddress++;
 }
 
+void SymbolTable::addCandidate(std::string varName)
+{
+    SymbolTable::variableCandidate.push(varName);
+}
+
+void SymbolTable::addVariableToTable()
+{
+    while (SymbolTable::variableCandidate.size() != 0)
+    {
+        auto varName = SymbolTable::variableCandidate.front();
+        SymbolTable::variableCandidate.pop();
+        if (SymbolTable::contains(varName))
+        {
+            continue;
+        }
+        SymbolTable::addEntry(varName, SymbolTable::getVariableAddress());
+        SymbolTable::increaseVariableAddress();
+    }
+}
+
 void SymbolTable::addEntry(std::string symbol, int address)
 {
     SymbolTable::symbolTable[symbol] = address;
@@ -55,9 +75,4 @@ bool SymbolTable::contains(std::string symbol)
 int SymbolTable::getAddress(std::string symbol)
 {
     return SymbolTable::symbolTable[symbol];
-}
-
-bool SymbolTable::isAvailableAddr(int address)
-{
-    return (address > 15 && address < SCREEN_ADDRESS);
 }

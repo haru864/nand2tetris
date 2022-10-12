@@ -45,12 +45,7 @@ int main(int argc, char *argv[])
             if (parser->commandType() == A_COMMAND && isVariable(parser->symbol()))
             {
                 // std::cout << "var: " << parser->symbol() << std::endl;
-                if (symbolTable->contains(parser->symbol()))
-                {
-                    continue;
-                }
-                symbolTable->addEntry(parser->symbol(), symbolTable->getVariableAddress());
-                symbolTable->increaseVariableAddress();
+                symbolTable->addCandidate(parser->symbol());
             }
         }
         else if (parser->commandType() == L_COMMAND)
@@ -65,6 +60,8 @@ int main(int argc, char *argv[])
             symbolTable->addEntry(symbol, addr);
         }
     }
+
+    symbolTable->addVariableToTable();
 
     rewind(parser->asmFile);
 
