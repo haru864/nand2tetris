@@ -1,4 +1,6 @@
-#include "../include/AllHeaders.h"
+#include "../include/Common.h"
+#include "../include/Parser.h"
+#include "../include/CodeWriter.h"
 
 using namespace std;
 
@@ -18,13 +20,20 @@ int main(int argc, char *argv[])
 		exit_error("set Xxx.vm as argument");
 	}
 	string asmFileName = vmFileName.substr(0, pos) + ".asm";
-	printf("%s\n", asmFileName.c_str());
+	// printf("%s\n", asmFileName.c_str());
+
+	// FILE *inFile = fopen(vmFileName.c_str(), "r");
+	// FILE *outFile = fopen(asmFileName.c_str(), "w");
+	// if (!inFile || !outFile)
+	// {
+	// 	exit_error("fail to open file");
+	// }
+
+	Parser *parser = new Parser(vmFileName);
+	CodeWriter *codeWriter = new CodeWriter(asmFileName);
+
+	delete parser;
+	delete codeWriter;
 
 	return EXIT_SUCCESS;
-}
-
-void exit_error(string message)
-{
-	fprintf(stderr, "error: %s\n", message.c_str());
-	exit(EXIT_FAILURE);
 }

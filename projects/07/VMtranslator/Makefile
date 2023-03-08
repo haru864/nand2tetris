@@ -1,7 +1,7 @@
 PROGRAM=VMtranslator
 OBJS=VMtranslator.o Parser.o CodeWriter.o
 SRCS=$(OBJS:%.o=%.cpp)
-HEADERS=AllHeaders.h Parser.h CodeWriter.h
+HEADERS=Common.h Parser.h CodeWriter.h
 CC=g++
 CFLAGS=-g -Wall
 LDFLAGS=

@@ -1,5 +1,5 @@
-#ifndef _ALLHEADERS_H_
-#define _ALLHEADERS_H_
+#ifndef _COMMON_H_
+#define _COMMON_H_
 
 #include <iostream>
 #include <stdio.h>
@@ -17,5 +17,17 @@
 #define C_FUNCTION 6
 #define C_RETURN 7
 #define C_CALL 8
+
+void safe_free(void *p)
+{
+	free(p);
+	p = NULL;
+}
+
+void exit_error(std::string message)
+{
+	fprintf(stderr, "error: %s\n", message.c_str());
+	exit(EXIT_FAILURE);
+}
 
 #endif
